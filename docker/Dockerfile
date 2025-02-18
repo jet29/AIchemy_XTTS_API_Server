@@ -19,9 +19,20 @@ RUN python3 -m pip install --upgrade pip setuptools wheel ninja virtualenv
 # WORKDIR /app
 
 # Install Python dependencies
+# Copy requirements.txt to the container
+COPY requirements.txt .
+
+# Install PyTorch and torchaudio
 RUN pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu121
-RUN pip install deepspeed
-RUN pip install xtts-api-server
+
+# Install other dependencies
+RUN pip install -r requirements.txt
+
+# Install deepspeed and xtts-api-server
+RUN pip install deepspeed xtts-api-server
+
+# Explicitly install TTS
+RUN pip install TTS
 
 # Expose the container ports
 EXPOSE 8020

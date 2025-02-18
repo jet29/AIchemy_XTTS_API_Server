@@ -3,6 +3,7 @@ version: '3.4'
 services:
   xttsapiserver:
     image: xttsapiserver
+    container_name: xtts-server
     env_file: .env
     build:
       context: ..
@@ -18,3 +19,10 @@ services:
             - driver: nvidia
               device_ids: ['0']
               capabilities: [gpu]
+    networks:
+      xtts-aichemy-network:
+        aliases:
+          - xtts-server
+networks:
+  xtts-aichemy-network:
+    external: true
