@@ -1,9 +1,10 @@
 version: '3.4'
 
+name: aichemy
 services:
   xttsapiserver:
     image: xttsapiserver
-    container_name: xtts-server
+    container_name: aichemy-xtts-server
     env_file: .env
     build:
       context: ..
