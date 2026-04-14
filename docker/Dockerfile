@@ -19,14 +19,14 @@ RUN python3 -m pip install --upgrade pip setuptools wheel ninja virtualenv
 # WORKDIR /app
 
 # Install Python dependencies
-# Copy requirements.txt to the container
-COPY requirements.txt .
+# Copy XTTS-specific requirements (build context is project root)
+COPY integrations/xtts-api-server/requirements.txt xtts-requirements.txt
 
 # Install PyTorch and torchaudio
 RUN pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu121
 
-# Install other dependencies
-RUN pip install -r requirements.txt
+# Install XTTS dependencies
+RUN pip install -r xtts-requirements.txt
 
 # Install deepspeed and xtts-api-server
 RUN pip install deepspeed xtts-api-server
@@ -34,11 +34,14 @@ RUN pip install deepspeed xtts-api-server
 # Explicitly install TTS
 RUN pip install TTS
 
-# Copy voice files (build context should include data/voice)
-COPY data/voice /app/speakers
+# Copy voice files (build context is project root)
+COPY data/voice /xtts-server/speakers
+
+# Create models directory (will be mounted as volume for persistence)
+RUN mkdir -p /xtts-server/models /xtts-server/output
 
 # Expose the container ports
 EXPOSE 8020
 
 # Run xtts_api_server when the container starts
-CMD ["bash", "-c", "python3 -m xtts_api_server --listen -p 8020 -t 'http://localhost:8020' -sf '/app/speakers' -o '/app/output' -mf '/app/models' --deepspeed"]
+CMD ["bash", "-c", "python3 -m xtts_api_server --listen -p 8020 -t 'http://localhost:8020' -sf '/xtts-server/speakers' -o '/xtts-server/output' -mf '/xtts-server/models' --deepspeed"]
